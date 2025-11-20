@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Example 02 – XR Grabbable Video Screen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+    <!-- A-Frame 1.7.x -->
+    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: transparent; /* passthrough background */
+      }
+    </style>
+  </head>
+
+  <body>
+    <a-scene
+      renderer="alpha: true; physicallyCorrectLights: true; colorManagement: true"
+      webxr="optionalFeatures: hit-test, hand-tracking;"
+      xr-mode-ui="XRMode: ar; enterAREnabled: true; enterVREnabled: false"
+      vr-mode-ui="enabled: false"
+      embedded
+    >
+      <a-assets>
+        <!-- Replace with your own video -->
+        <video
+          id="demo-video"
+          src="video.mp4"
+          loop="true"
+          playsinline
+          webkit-playsinline
+          crossorigin="anonymous"
+        ></video>
+      </a-assets>
+
+      <!-- HANDS -->
+      <a-entity
+        id="leftHand"
+        hand-tracking-controls="hand: left"
+        hand-tracking-grab-controls="hand: left"
+      ></a-entity>
+
+      <a-entity
+        id="rightHand"
+        hand-tracking-controls="hand: right"
+        hand-tracking-grab-controls="hand: right"
+      ></a-entity>
+
+      <!-- CAMERA  -->
+      <a-entity camera position="0 1.6 0"></a-entity>
+
+      <!-- GRABBABLE VIDEO SCREEN IN FRONT OF THE USER -->
+      <a-video
+        id="video-screen"
+        grabbable
+        src="#demo-video"
+        position="0 1.4 -1.0"
+        width="0.9"
+        height="0.5"
+        shadow="cast: true; receive: false"
+      ></a-video>
+
+      <!-- SIMPLE TEXT LABEL ABOVE THE VIDEO (aligned with new distance) -->
+      <a-text
+        value="NEON PINK"
+        position="0 1.9 -1.0"
+        align="center"
+        width="1.5"
+        color="#ffffff">
+      </a-text>
+
+      <!-- LIGHTS -->
+      <a-entity light="type: directional; intensity: 1" position="1 3 2"></a-entity>
+      <a-entity light="type: ambient; intensity: 0.4"></a-entity>
+    </a-scene>
+
+    <script>
+      const scene     = document.querySelector('a-scene');
+      const video     = document.querySelector('#demo-video');
+      const leftHand  = document.querySelector('#leftHand');
+      const rightHand = document.querySelector('#rightHand');
+
+      let audioEnabled = false;
+      let videoStarted = false;
+
+      // Try to start the video (muted) when entering immersive mode (AR).
+      scene.addEventListener('enter-vr', () => {
+        if (!video || videoStarted) return;
+        video.muted = true;
+        video.play().then(() => {
+          videoStarted = true;
+          console.log('Video started muted on enter-vr/AR');
+        }).catch(err => {
+          console.warn('Could not autoplay muted video:', err);
+        });
+      });
+
+      function enableVideoAudioOnce () {
+        if (!video || !videoStarted || audioEnabled) return;
+        video.muted = false;
+        video.play().then(() => {
+          audioEnabled = true;
+          console.log('Video audio enabled via pinch gesture');
+        }).catch(err => {
+          console.warn('Could not play video with sound:', err);
+        });
+      }
+
+      // Use pinch gesture from either hand as the "play sound" gesture
+      [leftHand, rightHand].forEach(hand => {
+        if (!hand) return;
+        hand.addEventListener('pinchstarted', enableVideoAudioOnce);
+      });
+    </script>
+  </body>
+</html>
