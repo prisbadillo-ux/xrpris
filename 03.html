@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Example 03 – XR Text + Image Panel (Grabbable)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: transparent;
+      }
+    </style>
+  </head>
+
+  <body>
+    <a-scene
+      renderer="alpha: true; physicallyCorrectLights: true; colorManagement: true"
+      webxr="optionalFeatures: hit-test, hand-tracking;"
+      xr-mode-ui="XRMode: ar; enterAREnabled: true; enterVREnabled: false"
+      vr-mode-ui="enabled: false"
+      embedded
+    >
+      <a-assets>
+        <img id="product-img" src="poster.jpg">
+      </a-assets>
+
+      <!-- HANDS -->
+      <a-entity
+        id="leftHand"
+        hand-tracking-controls="hand: left"
+        hand-tracking-grab-controls="hand: left"
+      ></a-entity>
+
+      <a-entity
+        id="rightHand"
+        hand-tracking-controls="hand: right"
+        hand-tracking-grab-controls="hand: right"
+      ></a-entity>
+
+      <!-- Basic camera -->
+      <a-entity camera position="0 1.6 0"></a-entity>
+
+      <!-- FLOATING INFO PANEL (WHOLE PANEL IS GRABBABLE) -->
+      <a-entity
+        id="info-panel"
+        grabbable
+        position="0 1.5 -1.3"
+      >
+        <!-- Background box acting as the main panel geometry -->
+        <a-box
+          width="1.3"
+          height="0.8"
+          depth="0.02"
+          color="#222"
+          opacity="0.75"
+          position="0 0 0"
+          shadow="cast: true; receive: false">
+        </a-box>
+
+        <!-- Product image (child of the panel) -->
+        <a-image
+          src="#product-img"
+          position="-0.35 0.05 0.02"
+          width="0.5"
+          height="0.5">
+        </a-image>
+
+        <!-- Info text (child of the panel) -->
+        <a-text
+          value="Product name\nTitle:Brutalism Style\nDescription:Achitechtural style that emerged during the 1950s in the United Kingdom, among the reconstruction projects of the post-war era.\nKey elements: exposed concrete, brick, angular geometric shapes, steel and glass "
+          position="0.15 0.2 0.02"
+          align="left"
+          width="0.8"
+          color="#ffffff">
+        </a-text>
+      </a-entity>
+
+      <!-- LIGHTS -->
+      <a-entity light="type: directional; intensity: 1" position="1 3 2"></a-entity>
+      <a-entity light="type: ambient; intensity: 0.4"></a-entity>
+    </a-scene>
+  </body>
+</html>
